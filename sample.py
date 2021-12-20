@@ -8,7 +8,7 @@ def get_diagonal(eig_value, eig_vec, value_list):
         value_list.append([eig_value[idx], eig_vec[idx]])
     return value_list
 
-# github
+# github aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 # データのロード
 data = pickle.load(open("ytc_py.pkl", 'rb'))
