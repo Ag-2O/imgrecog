@@ -6,12 +6,15 @@ from matplotlib import pyplot as plt
 def get_diagonal(eig_value, eig_vec, value_list):
     for idx in range(len(eig_value)):
         value_list.append([eig_value[idx], eig_vec[idx]])
+        #print("vec_shape: {}".format(eig_vec[idx].shape))
     return value_list
 
 # github aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
+r = 30
+
 # データのロード
-data = pickle.load(open("ytc_py.pkl", 'rb'))
+data = pickle.load(open("../imgrecog/ytc_py.pkl", 'rb'))
 X_train, y_train = data['X_train'], data['y_train']
 X_test, y_test = data['X_test'], data['y_test']
 
@@ -97,26 +100,29 @@ print("テストデータを調整した！")
 """ 部分関数を求める """
 
 W = np.empty([47,dim,dim])
+print("W.shape: {}".format(W.shape))
 
 #print("len_train_data: {}".format(len(train_data)))
 count = 0
 for group in train_data:
     print("count: {}".format(count))
     #print("len_group: {}".format(len(group)))
-    value_list = []
     #print("len_data: {}".format(len(data)))
-    for data in group:
+    for i, data in enumerate(group):
+        value_list = []
         X = data
         #print("shape_x: {}".format(X.reshape(1,-1)))
         #print("shape_x.T: {}".format(X.reshape(-1,1)))
-        C = X.reshape(1,-1)*X.reshape(-1,1)
+        C = X.reshape(-1,1)*X.reshape(1,-1)
         #print("C: {}".format(C))
         eig_value, eig_vec = np.linalg.eig(C)
+        #print("eig_value_size: {}, eig_vec_size: {}".format(eig_value.shape,eig_vec.shape))
         value_list = get_diagonal(eig_value, eig_vec, value_list)
-    
-    value_list = sorted(value_list,key=lambda x: x[0], reverse=True)
-    #print("value_list: {}".format(value_list[1]))
-    W[count,:,:] = value_list[1][1:100]
+        value_list = sorted(value_list,key=lambda x: x[0], reverse=True)
+        #print("value_list: {}".format(value_list[1]))
+        #print("sample_vec: {}".format(value_list[1:30][1][1]))
+        W[count,:,:] = value_list[1:30][1][1]
+    #print("W.shape: {}".format(W.shape))
     count += 1
 print("部分関数を求めた！")
 
@@ -124,13 +130,16 @@ print("部分関数を求めた！")
 
 out = np.empty(label_dim)
 count_ok = 0
-for i in range(test_size):
-    out = np.empty(label_dim)
-    for j in range(label_dim):
-        norm = np.dot(test_data[i][j], W[j, :, k])**2
-        out[j] = norm
-    if np.argmax(out) == j:
-        count_ok += 1
+count = 0
+for i, group in enumerate(test_data):
+    for j, data in enumerate(group):
+        for label in range(label_dim):
+            print("label_num: {}, data_num: {}".format(i,j))
+            out[label] = np.sum((W[label,:,1:r].T * test_data[i][j])**2)
+        if np.argmax(out) == i:
+            print("accurate!")
+            count_ok += 1
+        count += 1
 
 # 正解率
-print("accuracy: {}".format(count_ok/test_size * 100))
+print("accuracy: {}".format(count_ok/count * 100))
