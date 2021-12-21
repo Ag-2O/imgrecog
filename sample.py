@@ -127,7 +127,7 @@ def run_clafic(test_data, label_list, test_label_list,W):
             for label in range(label_dim):
                 #print("test_num: {}, label_num: {}, data_num: {}".format(i,label,j))
                 # sikibetu no siki 
-                out[label] = np.max((W[label,:,j].T * test_data[i][j])**2) / (np.linalg.norm(W[label,:,j].T)**2 * np.linalg.norm(test_data[i][j])**2)
+                out[label] = np.max((W[label:,:,1:r].T * test_data[i][j])**2) / (np.linalg.norm(W[label:,:,1:r].T)**2 * np.linalg.norm(test_data[i][j])**2)
                 #print("W: {}".format(W[label,:,:].T))
 
             print("out: \n {}".format(out))
